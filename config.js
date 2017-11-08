@@ -1,0 +1,1 @@
+export const mongoUrl = 'mongodb://admin:admin@ds151355.mlab.com:51355/rgr'
