@@ -1,29 +1,30 @@
 import React, { PureComponent } from 'react'
 import API from './API'
-import Store from './data/store'
+// import Store from './data/store'
 import actions from './data/actions'
+import Relay from 'react-relay/classic'
 
-const getAppState = () => ({ links: Store.getData() })
+// const getAppState = () => ({ links: Store.getData() })
 
-export default class Links extends PureComponent {
+class Links extends PureComponent {
   constructor() {
     super()
-    this.state = getAppState()
+    // this.state = getAppState()
   }
 
-  componentDidMount() {
-    actions.fetchLinks()
-    Store.on("change", this.onChange)
-  }
+  // componentDidMount() {
+  //   actions.fetchLinks()
+  //   Store.on("change", this.onChange)
+  // }
 
-  componentWillUnmount() {
-    Store.removeListener('change')
-  }
+  // componentWillUnmount() {
+  //   Store.removeListener('change')
+  // }
 
-  onChange = () => {
-    console.log("3. inside view")
-    this.setState(getAppState())
-  }
+  // onChange = () => {
+  //   console.log("3. inside view")
+  //   this.setState(getAppState())
+  // }
 
   renderLink = (link) => (
     <li key={link._id}>
@@ -32,11 +33,29 @@ export default class Links extends PureComponent {
   )
 
   render() {
-    console.log("links", this.state.links)
+    console.log("props", this.props.store)
     return (
       <ul>
-        {this.state.links.map(this.renderLink)}
+        {
+          this.props.store.links.map(this.renderLink)
+        }
       </ul>
     )
   }
 }
+
+Links = Relay.createContainer(Links, {
+  fragments: {
+    store: () => Relay.QL`
+        fragment on Store{
+          links{
+            _id,
+            title,
+            url
+          }
+        }
+      `
+  }
+})
+
+export default Links

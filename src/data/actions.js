@@ -11,14 +11,14 @@ const actions = {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        query: "{ getLinks {_id, title, url} }"
+        query: "{ links {_id, title, url} }"
       })
     })
       .then(parseResponse)
       .then(response => {
         dispatcher.dispatch({
           type: actionTypes.FETCH_LINKS,
-          data: response.data.getLinks
+          data: response.data.links
         })
       })
   }

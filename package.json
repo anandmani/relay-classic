@@ -19,8 +19,8 @@
     "mongodb": "^2.2.33",
     "react": "15.6.2",
     "react-dom": "15.6.2",
-    "webpack": "^3.8.1",
-    "react-relay": "0.7.1"
+    "react-relay": "1.0.0",
+    "webpack": "^3.8.1"
   },
   "babel": {
     "presets": [
@@ -38,7 +38,8 @@
   },
   "nodemonConfig": {
     "ignore": [
-      "schema.json"
+      "schema.json",
+      "schema.graphql"
     ]
   }
 }

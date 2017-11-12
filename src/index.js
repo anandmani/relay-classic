@@ -1,26 +1,23 @@
 import React, { PureComponent } from 'react'
 import ReactDOM from 'react-dom'
 import Links from './Links'
-import Relay from 'react-relay'
+import Relay from 'react-relay/classic'
 
-class App extends PureComponent {
-  render() {
-    return (
-      <div>
-        <Links />
-      </div>
-    )
+class LinksRoute extends Relay.Route {
+  static routeName = 'Links'
+  static queries = {
+    store: (Component) => Relay.QL`
+      query LinksQuery {
+        store { ${Component.getFragment('store')} }
+      }
+    `
   }
 }
 
-ReactDOM.render(<App />, document.getElementById('react'))
-
-console.log("relay",
-  Relay.QL`
-  query Test{
-    getLinks{
-      title
-    }
-  }
-  `
+ReactDOM.render(
+  <Relay.RootContainer
+    Component={Links}
+    route={new LinksRoute()}
+  />,
+  document.getElementById('react')
 )
