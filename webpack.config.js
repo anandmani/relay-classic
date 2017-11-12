@@ -17,7 +17,8 @@ module.exports = {
             presets: ['env'],
             plugins: [
               "transform-class-properties",
-              "transform-react-jsx"
+              "transform-react-jsx",
+              ["relay", { "schema": "schema.json" }]
             ]
           }
         }

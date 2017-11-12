@@ -17,7 +17,7 @@ export default class Links extends PureComponent {
   }
 
   componentWillUnmount() {
-
+    Store.removeListener('change')
   }
 
   onChange = () => {
@@ -32,6 +32,7 @@ export default class Links extends PureComponent {
   )
 
   render() {
+    console.log("links", this.state.links)
     return (
       <ul>
         {this.state.links.map(this.renderLink)}
