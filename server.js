@@ -16,17 +16,20 @@ let counter = 0
 let db
 (
   async function connect() {
-    const db = await MongoClient.connect(mongoUrl)
-    let schema = getSchema(db)
-    app.use('/graphql', graphqlHTTP({
-      schema,
-      graphiql: true
-    }))
-    app.listen(3000, () => console.log("Connected to Mongo \nListening on port 3k"))
+    try {
+      const db = await MongoClient.connect(mongoUrl)
+      let schema = getSchema(db)
+      app.use('/graphql', graphqlHTTP({
+        schema,
+        graphiql: true
+      }))
+      app.listen(3000, () => console.log("Connected to Mongo \nListening on port 3k"))
 
-    //Generate graphql schema json
-    let json = await graphql(schema, introspectionQuery)
-    fs.writeFile('schema.json', JSON.stringify(json, null, 2))
-
+      //Generate graphql schema json
+      let json = await graphql(schema, introspectionQuery)
+      fs.writeFile('schema.json', JSON.stringify(json, null, 2))
+    } catch (e) {
+      throw e
+    }
   }
 )()
