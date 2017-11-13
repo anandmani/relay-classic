@@ -22,7 +22,6 @@ const getSchema = (db) => {
       'id': {
         type: new GraphQLNonNull(GraphQLID),
         resolve: (obj) => obj._id
-
       },
       'title': { type: GraphQLString },
       'url': { type: GraphQLString }
@@ -37,7 +36,7 @@ const getSchema = (db) => {
   let storeType = new GraphQLObjectType({
     name: 'Store',
     fields: {
-      links: {
+      linkConnection: {
         type: linkConnection.connectionType,
         args: connectionArgs,
         resolve: (_, args) => (
