@@ -8,6 +8,7 @@ import {
 } from 'graphql'
 
 import {
+  globalIdField,
   connectionDefinitions,
   connectionArgs,
   connectionFromPromisedArray,
@@ -37,6 +38,7 @@ const getSchema = (db) => {
   let storeType = new GraphQLObjectType({
     name: 'Store',
     fields: {
+      id: globalIdField('Store'),
       linkConnection: {
         type: linkConnection.connectionType,
         args: connectionArgs,
@@ -62,6 +64,33 @@ const getSchema = (db) => {
     }
   })
 
+  /*
+  Graphiql: 
+
+    mutation addLinkMutation($input:AddLinkInput!){
+      addLink(input: $input){
+        linkEdge{
+          cursor
+          node{
+            id
+            title
+            url   
+          }
+        }
+        clientMutationId
+      }
+    }
+
+    Query variables: 
+    {
+      "input": {
+        "title" : "relay-1",
+        "url": "relay-1"
+      }
+    }
+
+  */
+  
   //Relay mutation
   let addLinkMutation = mutationWithClientMutationId({
     name: 'AddLink',
@@ -70,10 +99,14 @@ const getSchema = (db) => {
       url: { type: new GraphQLNonNull(GraphQLString) }
     },
     outputFields: {
-      link: {
-        type: linkType,
-        resolve: (response) => response.ops[0]
+      linkEdge: {
+        type: linkConnection.edgeType,
+        resolve: (response) => ({node: response.ops[0], cursor: response.insertedId})
       },
+      store: {
+        type: storeType,
+        resolve: () => storeType
+      }
     },
     mutateAndGetPayload: ({ title, url }) => db.collection("links").insertOne({ url, title })
   })
