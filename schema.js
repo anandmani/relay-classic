@@ -12,11 +12,24 @@ import {
   connectionDefinitions,
   connectionArgs,
   connectionFromPromisedArray,
-  mutationWithClientMutationId
+  mutationWithClientMutationId,
+  nodeDefinitions,
+  fromGlobalId
 } from 'graphql-relay'
 
 const getSchema = (db) => {
   let store = {}
+
+  let { nodeInterface, nodeField } = nodeDefinitions(
+    (globalId) => {
+      let { type } = fromGlobalId(globalId)
+      if (type == 'Store') {
+        return store
+      }
+      return null
+    },
+    (obj) => storeType
+  )
 
   let linkType = new GraphQLObjectType({
     name: 'Link',
@@ -37,19 +50,25 @@ const getSchema = (db) => {
 
   let storeType = new GraphQLObjectType({
     name: 'Store',
+    interfaces: [nodeInterface],
     fields: {
       id: globalIdField('Store'),
       linkConnection: {
         type: linkConnection.connectionType,
-        args: connectionArgs,
-        resolve: (_, args) => (
-          connectionFromPromisedArray(
-            db.collection("links").find({}).toArray()
+        args: { ...connectionArgs, search: { type: GraphQLString } },
+        resolve: (_, args) => {
+          let { search } = args
+          let findObj = {}
+          if (search) {
+            findObj.title = new RegExp(search, 'i')
+          }
+          return connectionFromPromisedArray(
+            db.collection("links").find(findObj).toArray()
               .then((links) => links)
               .catch(err => { throw err }),
             args
           )
-        )
+        }
       }
     }
   })
@@ -57,6 +76,7 @@ const getSchema = (db) => {
   let queryType = new GraphQLObjectType({
     name: 'Query',
     fields: {
+      node: nodeField,
       store: {
         type: storeType,
         resolve: () => store
@@ -90,7 +110,7 @@ const getSchema = (db) => {
     }
 
   */
-  
+
   //Relay mutation
   let addLinkMutation = mutationWithClientMutationId({
     name: 'AddLink',
@@ -101,7 +121,7 @@ const getSchema = (db) => {
     outputFields: {
       linkEdge: {
         type: linkConnection.edgeType,
-        resolve: (response) => ({node: response.ops[0], cursor: response.insertedId})
+        resolve: (response) => ({ node: response.ops[0], cursor: response.insertedId })
       },
       store: {
         type: storeType,

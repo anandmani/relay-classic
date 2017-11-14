@@ -9,7 +9,6 @@ const spanStyle = {
 
 class Link extends PureComponent {
   render() {
-    console.log("peorps", this.props)
     const hasOptimisticUpdate = this.props.relay.hasOptimisticUpdate(this.props.link)
     const { title, url } = this.props.link
     return (
